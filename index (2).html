@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CutBySlayDr">
+<meta name="theme-color" content="#F7F3EE">
+<title>CutBySlayDr</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F7F3EE;--bg-card:#FFFFFF;--bg-elevated:#EDE6DC;--bg-modal:#FFFFFF;--gold:#B07D20;--gold-bright:#D4961E;--gold-dim:rgba(176,125,32,0.13);--red:#C0392B;--teal:#0D7C7C;--plum:#7C2D6B;--navy:#1A2E55;--green:#1A6B3C;--text:#1A1209;--text-dim:#6B5E45;--text-muted:#A8977C;--border:rgba(0,0,0,0.09);--border-gold:rgba(176,125,32,0.3);--fs:16px;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;overflow:hidden;}
+#app{height:100%;display:flex;flex-direction:column;max-width:430px;margin:0 auto;position:relative;overflow:hidden;}
+.view{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;transform:translateX(100%);transition:transform .32s cubic-bezier(.4,0,.2,1);background:var(--bg);}
+.view.active{transform:translateX(0);}
+.clapper{height:8px;flex-shrink:0;background:repeating-linear-gradient(90deg,#1A1209 0,#1A1209 18px,var(--gold-bright) 18px,var(--gold-bright) 36px);}
+.hdr{display:flex;align-items:center;gap:8px;padding:14px 18px;padding-top:calc(14px + env(safe-area-inset-top));border-bottom:2px solid var(--border-gold);flex-shrink:0;background:var(--bg);}
+.hdr-logo{font-family:'Playfair Display',serif;font-size:20px;font-weight:900;letter-spacing:-.5px;flex:1;}
+.hdr-logo span{color:var(--gold);}
+.hdr-back{background:none;border:none;color:var(--gold);font-family:'Syne',sans-serif;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;}
+.hdr-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hdr-action{background:var(--gold);color:#fff;border:none;border-radius:8px;padding:7px 12px;font-family:'Syne',sans-serif;font-size:11px;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:.5px;flex-shrink:0;}
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 18px;padding-bottom:calc(90px + env(safe-area-inset-bottom));}
+.home-hero{background:linear-gradient(135deg,var(--navy) 0%,#2A1A5E 100%);border-radius:18px;padding:28px 22px;margin-bottom:24px;position:relative;overflow:hidden;}
+.home-hero::before{content:'🎬';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:80px;opacity:.15;line-height:1;}
+.home-hero-title{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;line-height:1.1;margin-bottom:8px;color:#fff;}
+.home-hero-title em{color:var(--gold-bright);font-style:italic;}
+.home-hero-sub{font-size:11px;color:rgba(255,255,255,.5);font-weight:700;letter-spacing:2px;text-transform:uppercase;}
+.sec-label{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.sec-label::after{content:'';flex:1;height:1.5px;background:var(--border-gold);}
+.card{background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;padding:16px 18px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.card:active{border-color:var(--gold);}
+.card-left{flex:1;min-width:0;}
+.card-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.card-meta{font-size:12px;color:var(--text-dim);}
+.card-arrow{color:var(--gold);font-size:22px;flex-shrink:0;}
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--navy),#2A4A8A);color:#fff;border:none;border-radius:14px;padding:16px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:1px;box-shadow:0 4px 16px rgba(26,46,85,.3);transition:opacity .15s;}
+.btn-primary:active{opacity:.85;}
+.btn-secondary{width:100%;background:transparent;color:var(--text);border:1.5px solid var(--border);border-radius:12px;padding:13px;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-top:10px;}
+.btn-ghost{background:none;border:none;cursor:pointer;font-family:'Syne',sans-serif;color:var(--text-dim);font-size:12px;font-weight:600;padding:6px 10px;border-radius:6px;}
+.btn-ghost.danger{color:var(--red);}
+.mode-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px;}
+.mode-btn{border:none;border-radius:14px;padding:20px 12px;cursor:pointer;text-align:center;transition:transform .12s,filter .12s;}
+.mode-btn:active{transform:scale(.97);filter:brightness(.92);}
+.mode-btn-cue{background:linear-gradient(135deg,#6B1A1A,#B02020);}
+.mode-btn-rehearse{background:linear-gradient(135deg,#1A5C3A,#28A06A);}
+.mode-btn-director{background:linear-gradient(135deg,#1A2E55,#2A4A8A);}
+.mode-btn-actor{background:linear-gradient(135deg,#7C2D6B,#B24D9E);}
+.mode-btn-tp{background:linear-gradient(135deg,#0D7C7C,#12AAAA);}
+.mode-btn-del{background:linear-gradient(135deg,#3A1A1A,#7A2020);}
+.mode-icon{font-size:26px;margin-bottom:8px;}
+.mode-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:rgba(255,255,255,.9);}
+.scene-item{background:var(--bg-card);border:1.5px solid var(--border);border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.scene-item.done{border-color:rgba(26,107,60,.3);background:#F2FAF5;}
+.scene-head{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;}
+.scene-num{width:30px;height:30px;background:var(--navy);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:#fff;flex-shrink:0;}
+.scene-num.done{background:var(--green);}
+.scene-name{flex:1;font-size:14px;font-weight:700;}
+.scene-meta{font-size:12px;color:var(--text-dim);}
+.scene-foot{display:flex;align-items:center;gap:6px;padding:0 16px 14px;flex-wrap:wrap;}
+.role-tag{font-size:10px;font-weight:800;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px;}
+.mark-btn{margin-left:auto;font-size:10px;font-weight:800;padding:5px 12px;border-radius:20px;border:none;cursor:pointer;font-family:'Syne',sans-serif;}
+.script-line{background:var(--bg-card);border-radius:12px;padding:14px;margin-bottom:12px;border-left:4px solid transparent;box-shadow:0 2px 8px rgba(0,0,0,.05);}
+.line-badge{display:inline-block;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:4px 10px;border-radius:20px;margin-bottom:8px;}
+.line-text{font-size:var(--fs);line-height:1.65;}
+.line-dir{font-size:12px;color:var(--text-dim);font-style:italic;margin-top:6px;}
+.line-actions{display:flex;gap:4px;flex-wrap:wrap;margin-top:10px;}
+.filter-bar{display:flex;gap:7px;overflow-x:auto;padding:10px 18px;background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;scrollbar-width:none;}
+.filter-bar::-webkit-scrollbar{display:none;}
+.chip{display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);background:transparent;color:var(--text-dim);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap;flex-shrink:0;}
+.chip-dot{width:6px;height:6px;border-radius:50%;}
+.actor-btn{display:flex;align-items:center;gap:14px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:10px;cursor:pointer;width:100%;text-align:left;box-shadow:0 2px 8px rgba(0,0,0,.04);}
+.actor-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
+.actor-name{flex:1;font-size:16px;font-weight:700;}
+.actor-count{font-size:12px;color:var(--text-dim);}
+/* CUE */
+.cue-progress-bar{height:6px;background:var(--bg-elevated);flex-shrink:0;}
+.cue-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold-bright),#E8A820);transition:width .3s;}
+.cue-hdr{display:flex;align-items:center;gap:10px;padding:12px 18px;padding-top:calc(12px + env(safe-area-inset-top));border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg);}
+.cue-counter{font-size:11px;font-weight:800;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;flex:1;}
+#cue-area{flex:1;display:flex;flex-direction:column;justify-content:center;padding:24px 22px;overflow-y:auto;}
+.cue-role-pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:20px;margin-bottom:14px;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:1px;}
+.cue-text{font-family:'Playfair Display',serif;font-size:var(--fs);line-height:1.75;margin-bottom:14px;}
+.cue-dir-box{background:var(--bg-elevated);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--text-dim);font-style:italic;}
+.cue-next-box{background:var(--bg-elevated);border-radius:10px;padding:10px 14px;margin-bottom:14px;}
+.cue-next-lbl{font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;}
+.cue-next-text{font-size:13px;color:var(--text-dim);line-height:1.5;font-style:italic;}
+.cue-hint{font-size:11px;color:var(--text-muted);font-weight:700;text-align:center;letter-spacing:.5px;text-transform:uppercase;}
+.cue-controls{display:flex;align-items:center;gap:10px;padding:14px 18px;padding-bottom:calc(14px + env(safe-area-inset-bottom));border-top:2px solid var(--border-gold);flex-shrink:0;background:var(--bg);}
+.cue-prev{background:var(--bg-elevated);border:none;border-radius:12px;padding:15px 18px;font-family:'Syne',sans-serif;font-size:13px;font-weight:800;cursor:pointer;color:var(--text-dim);}
+.cue-next{flex:1;background:linear-gradient(135deg,var(--navy),#2A4A8A);color:#fff;border:none;border-radius:12px;padding:15px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:pointer;}
+.cue-done-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;}
+.cue-done-icon{font-size:70px;margin-bottom:16px;}
+.cue-done-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:900;margin-bottom:8px;}
+.cue-done-sub{font-size:14px;color:var(--text-dim);margin-bottom:32px;line-height:1.6;}
+/* REHEARSE */
+.rehear-wrap{background:var(--bg-elevated);border-radius:10px;padding:10px 14px;margin-bottom:8px;border-left:3px solid transparent;}
+.rehear-hide{border:2px dashed var(--border-gold);border-radius:10px;padding:16px;text-align:center;cursor:pointer;margin-bottom:8px;}
+.rehear-show{background:linear-gradient(135deg,#FFF9F0,#FFF3E0);border:1.5px solid var(--border-gold);border-radius:10px;padding:14px;margin-bottom:8px;}
+/* TP */
+.tp-header{display:flex;align-items:center;gap:8px;padding:12px 18px;padding-top:calc(12px + env(safe-area-inset-top));background:var(--bg);border-bottom:2px solid var(--border-gold);flex-shrink:0;}
+.tp-title{font-size:13px;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:1px;flex:1;}
+#tp-wrap{flex:1;overflow:hidden;position:relative;}
+#tp-scroll{padding:0 26px;will-change:transform;}
+.tp-spacer{height:38vh;}
+.tp-spacer-b{height:60vh;}
+.tp-line{margin-bottom:32px;}
+.tp-role{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px;}
+.tp-text{font-family:'Playfair Display',serif;font-size:var(--fs);line-height:1.6;color:var(--text);}
+.tp-dir{font-size:13px;color:var(--text-muted);font-style:italic;margin-top:4px;}
+.tp-controls{background:var(--bg);border-top:2px solid var(--border-gold);padding:12px 18px;padding-bottom:calc(12px + env(safe-area-inset-bottom));display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.tp-play{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--navy),#2A4A8A);border:none;color:#fff;font-size:18px;cursor:pointer;flex-shrink:0;}
+.speed-ctrl{flex:1;display:flex;flex-direction:column;gap:3px;}
+.speed-lbl{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;font-weight:700;}
+input[type=range]{width:100%;accent-color:var(--gold);}
+.tp-btn-sm{background:var(--bg-elevated);border:none;border-radius:8px;padding:8px 10px;font-size:12px;font-weight:700;cursor:pointer;color:var(--text-dim);flex-shrink:0;}
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:100;display:flex;align-items:flex-end;backdrop-filter:blur(6px);}
+.sheet{background:var(--bg-modal);border-radius:20px 20px 0 0;padding:22px 18px;padding-bottom:calc(22px + env(safe-area-inset-bottom));width:100%;max-height:88vh;overflow-y:auto;}
+.sheet-handle{width:38px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;}
+.sheet-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:20px;}
+.fg{margin-bottom:16px;}
+.fl{display:block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-muted);margin-bottom:8px;}
+.fi,.fta{width:100%;background:var(--bg-elevated);border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-family:'Syne',sans-serif;font-size:15px;outline:none;transition:border-color .15s;}
+.fi:focus,.fta:focus{border-color:var(--gold);}
+.fta{resize:none;min-height:90px;line-height:1.5;}
+.role-picker{display:flex;flex-wrap:wrap;gap:7px;}
+.rpick{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:8px;border:1.5px solid var(--border);background:transparent;color:var(--text-dim);font-family:'Syne',sans-serif;font-size:11px;font-weight:700;cursor:pointer;}
+.rpick.sel{color:#000;}
+.swatches{display:flex;gap:8px;flex-wrap:wrap;}
+.swatch{width:28px;height:28px;border-radius:50%;border:2.5px solid transparent;cursor:pointer;}
+.swatch.sel{border-color:#000;}
+.role-row{display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg-card);border-radius:10px;margin-bottom:8px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.role-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
+.role-row-name{flex:1;font-size:15px;font-weight:600;}
+.role-del{background:none;border:none;color:var(--text-muted);font-size:18px;cursor:pointer;padding:4px;}
+.setting-row{display:flex;align-items:center;gap:14px;padding:15px;background:var(--bg-card);border-radius:12px;margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.setting-icon{font-size:22px;flex-shrink:0;}
+.setting-info{flex:1;}
+.setting-name{font-size:14px;font-weight:700;margin-bottom:2px;}
+.setting-desc{font-size:12px;color:var(--text-dim);}
+.toggle{width:48px;height:28px;background:var(--bg-elevated);border-radius:14px;position:relative;cursor:pointer;border:none;transition:background .2s;flex-shrink:0;}
+.toggle.on{background:var(--navy);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2);}
+.toggle.on::after{transform:translateX(20px);}
+.fs-row{display:flex;align-items:center;gap:10px;}
+.fs-btn{background:var(--bg-elevated);border:none;border-radius:8px;padding:8px 16px;font-size:16px;font-weight:700;cursor:pointer;color:var(--text);}
+.fs-val{font-size:14px;font-weight:700;color:var(--navy);min-width:32px;text-align:center;}
+.rec{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;color:var(--red);text-transform:uppercase;letter-spacing:1px;}
+.rec::before{content:'';width:7px;height:7px;background:var(--red);border-radius:50%;animation:blink 1s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--navy);color:#fff;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:700;z-index:200;opacity:0;transition:all .25s;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.empty{text-align:center;padding:40px 16px;color:var(--text-muted);}
+.empty-icon{font-size:44px;margin-bottom:10px;}
+.empty-text{font-size:13px;line-height:1.6;}
+.dir-toggle-btn{background:var(--bg-elevated);border:none;border-radius:8px;padding:6px 12px;font-size:11px;font-weight:700;color:var(--text-dim);cursor:pointer;font-family:'Syne',sans-serif;flex-shrink:0;}
+.info-box{background:var(--bg-elevated);border-radius:12px;padding:12px 14px;margin-bottom:20px;font-size:13px;color:var(--text-dim);line-height:1.5;}
+.info-box strong{color:var(--text);font-size:12px;}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+<script>
+// ══════════════════════════════════════════════
+// DATA
+// ══════════════════════════════════════════════
+const COLORS=['#B07D20','#E8688A','#4ECDC4','#A78BFA','#60A5FA','#FB923C','#F472B6','#34D399','#F87171','#818CF8','#FCD34D','#1A6B3C'];
+const DEFAULT_ROLES=[
+  {id:'ceo',name:'CEO / Slay Dr',color:'#B07D20'},
+  {id:'interviewer',name:'Interviewer',color:'#E8688A'},
+  {id:'decorator',name:'Decorator',color:'#4ECDC4'},
+  {id:'event-planner',name:'Event Planner',color:'#A78BFA'},
+  {id:'narrator',name:'Narrator',color:'#60A5FA'},
+  {id:'game-master',name:'Game Master',color:'#FB923C'},
+  {id:'costumier',name:'Costumier',color:'#F472B6'},
+];
+const INTRO={id:'intro-001',name:'The Intro Video',createdAt:Date.now(),scenes:[
+  {id:'s1',name:'Opening — The Greeting',done:false,lines:[
+    {id:'l1',roleId:'interviewer',text:'Hello ma\'am! How are you today?',direction:'Warm, upbeat energy — big smile to camera'},
+    {id:'l2',roleId:'ceo',text:'I\'m very well, thank you.',direction:'adjusts self — pause, then look back up'},
+    {id:'l3',roleId:'ceo',text:'How about yourself?',direction:''},
+    {id:'l4',roleId:'interviewer',text:'I\'m well too, thanks for asking. Thank you for joining us today. Before we get started, can we meet you?',direction:'Friendly, welcoming tone'},
+  ]},
+  {id:'s2',name:'Q1 — Can We Meet You?',done:false,lines:[
+    {id:'l5',roleId:'ceo',text:'Sure, absolutely! I\'m Dr. Taiwo Adenuga-Adeloye — A.K.A. Slay Dr.',direction:'winks at camera'},
+    {id:'l6',roleId:'ceo',text:'I wear a lot of hats.',direction:'smiles'},
+    {id:'l7',roleId:'ceo',text:'I\'m a Project Manager by profession, a scholar and researcher at heart, and an event artist by passion. I\'m also the Co-Founder of Design By Riah.',direction:''},
+    {id:'l8',roleId:'ceo',text:'Oh, and I build apps on the side too!',direction:'Cheeky — let that land'},
+    {id:'l9',roleId:'ceo',text:'Personally, I just love creating and making things beautiful — whether it\'s with code, balloons, or flowers!',direction:'smiles naturally'},
+    {id:'l10',roleId:'ceo',text:'But on this page, you\'ll get to see the creative side of me. This is where I get to play and be creative.',direction:'Lean in — speak directly to your audience'},
+    {id:'l11',roleId:'interviewer',text:'Oh wow, Slay Dr.! That\'s amazing — you really do wear a lot of hats! I love that. So tell me, what made you start doing balloon decorations?',direction:'Genuine surprise and admiration'},
+  ]},
+  {id:'s3',name:'Q2 — What Made You Start?',done:false,lines:[
+    {id:'l12',roleId:'ceo',text:'Honestly? Being broke abroad!',direction:'laughs — let it be real and relatable'},
+    {id:'l13',roleId:'ceo',text:'When I moved here, I quickly realized that hiring a decorator for every little birthday or anniversary was NOT in the budget. But I still wanted my moments to feel special, you know? I didn\'t want to just let occasions pass by with nothing.',direction:'Pause on "not in the budget" — make it emphatic'},
+    {id:'l14',roleId:'ceo',text:'So I was like... let me just figure this out myself. YouTube and Instagram became my best friends. I started small, made a lot of mistakes, but I fell in love with it.',direction:'Warm and nostalgic'},
+    {id:'l15',roleId:'interviewer',text:'I love that — necessity really is the mother of invention! So tell me, what was your first attempt like?',direction:''},
+  ]},
+  {id:'s4',name:'Q3 — First Attempt',done:false,lines:[
+    {id:'l16',roleId:'ceo',text:'A HOT MESS.',direction:'laughs — don\'t hold back'},
+    {id:'l17',roleId:'ceo',text:'Not gonna lie, it wasn\'t great — I mean, compared to how much I\'ve perfected things over the years.',direction:''},
+    {id:'l18',roleId:'ceo',text:'My balloon garland had uneven sizes, balloons were popping left and right... I think I spent like 3 hours on something that should\'ve taken 45 minutes. Let me just say, I definitely went through the beginner stage!',direction:'laughs again — funny and humble'},
+    {id:'l19',roleId:'ceo',text:'But you know what? I didn\'t give up. I kept trying, kept learning, and slowly it started looking more like what I had envisioned.',direction:'Shift to proud and determined energy'},
+    {id:'l20',roleId:'interviewer',text:'And look at you now! So speaking of now — what can you do today?',direction:'Impressed, hyping her up'},
+  ]},
+  {id:'s5',name:'Q4 — What Can You Do Now?',done:false,lines:[
+    {id:'l21',roleId:'ceo',text:'Oh, I love that question!',direction:'Big smile — genuine excitement'},
+    {id:'l22',roleId:'ceo',text:'Now? I can turn my living room into a whole event venue! I\'ve done birthdays, anniversaries, get-togethers, gender reveals — all in my own home.',direction:''},
+    {id:'l23',roleId:'ceo',text:'I\'ve successfully created a great number of \'wow\' birthday moments for my family and friends — moments I thought only expensive decorators could create.',direction:''},
+    {id:'l24',roleId:'ceo',text:'And the best part? I did it myself, on a budget. It feels so good to look around and know I made this happen.',direction:'Proud pause — let that breathe'},
+    {id:'l25',roleId:'interviewer',text:'That\'s incredible! So who is this page for? Who should be following you?',direction:''},
+  ]},
+  {id:'s6',name:'Q5 — Who Is This Page For?',done:false,lines:[
+    {id:'l26',roleId:'ceo',text:'This page is for my people — the ones abroad who can\'t afford a decorator for every little celebration.',direction:'Direct to camera — speak to THEM'},
+    {id:'l27',roleId:'ceo',text:'My DIY folks who aren\'t afraid to try something new. The ones who believe that every moment deserves to feel special, even the small ones. Even those who want to do this as a side hustle.',direction:''},
+    {id:'l28',roleId:'ceo',text:'If you\'ve ever looked at a beautiful setup on Instagram and thought \'I wish I could do that\' — you CAN. And I\'m here to show you how.',direction:'Strong, empowering — land hard on "you CAN"'},
+    {id:'l29',roleId:'ceo',text:'No fancy studios, no huge budgets. Just creativity and a little effort.',direction:'Smile — keep it warm'},
+    {id:'l30',roleId:'interviewer',text:'I love that so much. Okay, final question — what should people do if this sounds like them?',direction:''},
+  ]},
+  {id:'s7',name:'Q6 — The Call To Action',done:false,lines:[
+    {id:'l31',roleId:'ceo',text:'If this sounds like you, come with me on this journey!',direction:'Lean into camera — personal and direct'},
+    {id:'l32',roleId:'ceo',text:'Follow along — seriously, hit that follow button. I\'m going to be sharing all my tips, tricks, tutorials — everything I\'ve learned. And I want to build a community here.',direction:''},
+    {id:'l33',roleId:'ceo',text:'So if this sounds like you, drop a 🎈 or 🌺 in the comments and let me know you\'re here!',direction:'Big energy — this is the hype moment'},
+    {id:'l34',roleId:'ceo',text:'Welcome, my fellow Deckies — we\'re about to make some magic together!',direction:'Biggest smile of the whole video — HOLD IT'},
+    {id:'l35',roleId:'interviewer',text:'I love it! Thank you so much, Slay Dr. — this was amazing!',direction:''},
+    {id:'l36',roleId:'ceo',text:'Thank you for having me!',direction:'smiles — warm close'},
+  ]},
+]};
+
+// ══════════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════════
+function load(){try{const s=localStorage.getItem('cbsd_v3');if(s)return JSON.parse(s);}catch(e){}return{projects:[INTRO],roles:DEFAULT_ROLES,settings:{showDir:true,wakelock:true,fontSize:16}};}
+function save(){try{localStorage.setItem('cbsd_v3',JSON.stringify({projects:S.projects,roles:S.roles,settings:S.settings}));}catch(e){}}
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+const saved=load();
+const S={
+  view:'home',projectId:null,sceneId:null,
+  filterRole:null,actorRoleId:null,
+  cueIdx:0,cueRole:null,
+  rehearseRevealed:{},
+  tpRole:null,tpRunning:false,tpSpeed:1.5,tpY:0,
+  modal:null,editLineId:null,lastRoleId:null,newColor:COLORS[1],
+  projects:saved.projects,roles:saved.roles,
+  settings:saved.settings||{showDir:true,wakelock:true,fontSize:16},
+};
+
+// ══════════════════════════════════════════════
+// UTILS
+// ══════════════════════════════════════════════
+const uid=()=>Math.random().toString(36).slice(2,9);
+const proj=()=>S.projects.find(p=>p.id===S.projectId);
+const scene=()=>{const p=proj();return p&&p.scenes.find(sc=>sc.id===S.sceneId);};
+const role=id=>S.roles.find(r=>r.id===id);
+const rname=id=>{const r=role(id);return r?r.name:'?';};
+const rcolor=id=>{const r=role(id);return r?r.color:'#999';};
+function allLines(p,rid){const out=[];p.scenes.forEach(sc=>sc.lines.forEach(l=>{if(!rid||l.roleId===rid)out.push({...l,sceneName:sc.name});}));return out;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+
+// ══════════════════════════════════════════════
+// WAKE LOCK
+// ══════════════════════════════════════════════
+let wakeLock=null;
+async function reqWake(){if(!S.settings.wakelock)return;try{if('wakeLock' in navigator)wakeLock=await navigator.wakeLock.request('screen');}catch(e){}}
+function relWake(){try{if(wakeLock){wakeLock.release();wakeLock=null;}}catch(e){}}
+
+// ══════════════════════════════════════════════
+// NAV
+// ══════════════════════════════════════════════
+const BACK={project:'home','scene-editor':'project',director:'project',actor:'project',cue:'project',rehearse:'project',teleprompter:'project',roles:'home',settings:'home'};
+function nav(v,o={}){
+  if(S.view==='teleprompter'||S.view==='cue')relWake();
+  S.view=v;
+  if(o.projectId!==undefined)S.projectId=o.projectId;
+  if(o.sceneId!==undefined)S.sceneId=o.sceneId;
+  if(v==='cue'){S.cueIdx=0;S.cueRole=null;S.rehearseRevealed={};reqWake();}
+  if(v==='teleprompter'){S.tpY=0;S.tpRunning=false;reqWake();}
+  if(v==='rehearse'){S.actorRoleId=null;S.rehearseRevealed={};}
+  render();
+}
+function back(){stopTP();nav(BACK[S.view]||'home');}
+
+// ══════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════
+function render(){
+  save();
+  document.documentElement.style.setProperty('--fs',(S.settings.fontSize||16)+'px');
+  const views=['home','project','scene-editor','director','actor','cue','rehearse','teleprompter','roles','settings'];
+  document.getElementById('app').innerHTML=views.map(v=>`<div class="view${S.view===v?' active':''}" id="v-${v}">${S.view===v?vRender(v):''}</div>`).join('')+renderModal();
+  if(S.view==='teleprompter')initTP();
+}
+function vRender(v){switch(v){case 'home':return vHome();case 'project':return proj()?vProject():'';case 'scene-editor':return scene()?vSceneEditor():'';case 'director':return proj()?vDirector():'';case 'actor':return proj()?vActor():'';case 'cue':return proj()?vCue():'';case 'rehearse':return proj()?vRehearse():'';case 'teleprompter':return proj()?vTP():'';case 'roles':return vRoles();case 'settings':return vSettings();}return'';}
+
+// ══════════════════════════════════════════════
+// HOME
+// ══════════════════════════════════════════════
+function vHome(){
+  const ps=S.projects;
+  return`<div class="clapper"></div>
+  <div class="hdr">
+    <div class="hdr-logo">🎬 Cut<span>By</span>SlayDr</div>
+    <button class="hdr-action" style="background:var(--plum);margin-right:6px" onclick="nav('roles')">🎭 Roles</button>
+    <button class="hdr-action" style="background:var(--bg-elevated);color:var(--text-dim)" onclick="nav('settings')">⚙️</button>
+  </div>
+  <div class="content">
+    <div class="home-hero">
+      <div class="home-hero-title">Your<br><em>Scripts.</em><br>Your Stage.</div>
+      <div class="home-hero-sub" style="margin-top:10px">Direct · Perform · Deliver</div>
+    </div>
+    <div class="sec-label">My Scripts (${ps.length})</div>
+    ${ps.length===0?`<div class="empty"><div class="empty-icon">🎬</div><div class="empty-text">No scripts yet.<br>Tap below to create your first.</div></div>`:
+    ps.map(p=>{const d=(p.scenes||[]).filter(s=>s.done).length,t=p.scenes.length;
+    return`<div class="card" onclick="nav('project',{projectId:'${p.id}'})">
+      <div class="card-left">
+        <div class="card-name">${esc(p.name)}${d===t&&t>0?' ✅':''}</div>
+        <div class="card-meta">${t} scene${t!==1?'s':''} · ${p.scenes.reduce((a,s)=>a+s.lines.length,0)} lines${d>0?` · ${d}/${t} shot`:''}</div>
+      </div><div class="card-arrow">›</div>
+    </div>`;}).join('')}
+    <div style="height:14px"></div>
+    <button class="btn-primary" onclick="openModal('add-project')">+ New Script</button>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// PROJECT
+// ══════════════════════════════════════════════
+function vProject(){
+  const p=proj();
+  const done=(p.scenes||[]).filter(s=>s.done).length,tot=p.scenes.length;
+  return`<div class="clapper"></div>
+  <div class="hdr">
+    <button class="hdr-back" onclick="back()">‹ Back</button>
+    <div class="hdr-title">${esc(p.name)}</div>
+    <button class="hdr-action" onclick="openModal('add-scene')">+ Scene</button>
+  </div>
+  <div class="content">
+    <div class="sec-label" style="margin-bottom:12px">Choose Mode</div>
+    <div class="mode-grid">
+      <div class="mode-btn mode-btn-cue" onclick="nav('cue',{projectId:'${p.id}'})"><div class="mode-icon">🎯</div><div class="mode-label">Cue Mode</div></div>
+      <div class="mode-btn mode-btn-rehearse" onclick="nav('rehearse',{projectId:'${p.id}'})"><div class="mode-icon">🧠</div><div class="mode-label">Rehearse</div></div>
+      <div class="mode-btn mode-btn-director" onclick="nav('director',{projectId:'${p.id}',filterRole:null})"><div class="mode-icon">🎬</div><div class="mode-label">Director View</div></div>
+      <div class="mode-btn mode-btn-actor" onclick="S.actorRoleId=null;nav('actor',{projectId:'${p.id}'})"><div class="mode-icon">🎭</div><div class="mode-label">Actor Mode</div></div>
+      <div class="mode-btn mode-btn-tp" onclick="nav('teleprompter',{projectId:'${p.id}'})"><div class="mode-icon">📺</div><div class="mode-label">Teleprompter</div></div>
+      <div class="mode-btn mode-btn-del" onclick="delProject('${p.id}')"><div class="mode-icon">🗑️</div><div class="mode-label">Delete</div></div>
+    </div>
+    ${done>0?`<div style="background:linear-gradient(135deg,#E8F5EE,#F5FDF8);border:1.5px solid rgba(26,107,60,.2);border-radius:12px;padding:14px 16px;margin-bottom:20px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><span style="font-size:18px">🎬</span><span style="font-size:12px;font-weight:800;color:var(--green)">FILMING PROGRESS — ${done}/${tot} scenes shot</span>${done===tot?'<span style="margin-left:auto">✅</span>':''}</div>
+      <div style="height:6px;background:rgba(26,107,60,.15);border-radius:3px"><div style="height:100%;width:${Math.round(done/tot*100)}%;background:var(--green);border-radius:3px;transition:width .3s"></div></div>
+    </div>`:''}
+    <div class="sec-label">Scenes (${tot})</div>
+    ${tot===0?`<div class="empty"><div class="empty-icon">🎞️</div><div class="empty-text">No scenes yet.</div></div>`:
+    p.scenes.map((sc,i)=>{const rids=[...new Set(sc.lines.map(l=>l.roleId))];
+    return`<div class="scene-item${sc.done?' done':''}">
+      <div class="scene-head" onclick="nav('scene-editor',{projectId:'${p.id}',sceneId:'${sc.id}'})">
+        <div class="scene-num${sc.done?' done':''}">${sc.done?'✓':(i+1)}</div>
+        <div class="scene-name">${esc(sc.name)}</div>
+        <div class="scene-meta">${sc.lines.length} line${sc.lines.length!==1?'s':''} ›</div>
+      </div>
+      <div class="scene-foot">
+        ${rids.map(rid=>{const r=role(rid);return r?`<span class="role-tag" style="background:${r.color}20;color:${r.color}">${r.name}</span>`:''}).join('')}
+        <button class="mark-btn" style="${sc.done?'background:#E8F5EE;color:var(--green)':'background:var(--bg-elevated);color:var(--text-muted)'}" onclick="toggleDone('${p.id}','${sc.id}',event)">${sc.done?'✅ Shot':'Mark Shot'}</button>
+      </div>
+    </div>`;}).join('')}
+  </div>`;
+}
+function toggleDone(pid,sid,e){e.stopPropagation();const p=S.projects.find(x=>x.id===pid);const sc=p&&p.scenes.find(s=>s.id===sid);if(sc){sc.done=!sc.done;if(sc.done)toast('Scene marked as shot! 🎬');}render();}
+
+// ══════════════════════════════════════════════
+// SCENE EDITOR
+// ══════════════════════════════════════════════
+function vSceneEditor(){
+  const sc=scene();
+  return`<div class="clapper"></div>
+  <div class="hdr">
+    <button class="hdr-back" onclick="back()">‹ Back</button>
+    <div class="hdr-title">${esc(sc.name)}</div>
+    <button class="hdr-action" onclick="openAddLine()">+ Line</button>
+  </div>
+  <div class="content">
+    ${sc.lines.length===0?`<div class="empty"><div class="empty-icon">📝</div><div class="empty-text">No lines yet.<br>Tap "+ Line" to start writing.</div></div>`:
+    sc.lines.map((ln,i)=>{const rc=rcolor(ln.roleId);return`<div class="script-line" style="border-left-color:${rc}">
+      <span class="line-badge" style="background:${rc}20;color:${rc}">${rname(ln.roleId)}</span>
+      <div class="line-text">${esc(ln.text)}</div>
+      ${ln.direction?`<div class="line-dir">📐 ${esc(ln.direction)}</div>`:''}
+      <div class="line-actions">
+        <button class="btn-ghost" onclick="openEditLine('${ln.id}')">✏️ Edit</button>
+        <button class="btn-ghost danger" onclick="delLine('${ln.id}')">🗑 Del</button>
+        ${i>0?`<button class="btn-ghost" onclick="moveLine('${ln.id}',-1)">↑</button>`:''}
+        ${i<sc.lines.length-1?`<button class="btn-ghost" onclick="moveLine('${ln.id}',1)">↓</button>`:''}
+      </div>
+    </div>`;}).join('')}
+    <div style="height:12px"></div>
+    <button class="btn-ghost danger" style="width:100%;padding:14px;border:1.5px solid rgba(192,57,43,.2);border-radius:10px" onclick="delScene('${sc.id}')">🗑 Delete Scene</button>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// DIRECTOR
+// ══════════════════════════════════════════════
+function vDirector(){
+  const p=proj();
+  const rids=[...new Set(p.scenes.flatMap(sc=>sc.lines.map(l=>l.roleId)))];
+  const proles=S.roles.filter(r=>rids.includes(r.id));
+  const fr=S.filterRole,sd=S.settings.showDir;
+  return`<div class="clapper"></div>
+  <div class="hdr">
+    <button class="hdr-back" onclick="back()">‹ Back</button>
+    <div class="hdr-title">Director View</div>
+    <button class="dir-toggle-btn" onclick="S.settings.showDir=!S.settings.showDir;render()">${sd?'Hide 📐':'Show 📐'}</button>
+  </div>
+  <div class="filter-bar">
+    <button class="chip" style="${!fr?'background:var(--navy);color:#fff;border-color:var(--navy)':''}" onclick="S.filterRole=null;render()">All</button>
+    ${proles.map(r=>`<button class="chip" style="${fr===r.id?`background:${r.color};color:#000;border-color:${r.color}`:''}" onclick="S.filterRole='${r.id}';render()"><span class="chip-dot" style="background:${r.color}"></span>${r.name}</button>`).join('')}
+  </div>
+  <div class="content" style="padding-top:12px">
+    ${p.scenes.map(sc=>{
+      const lines=fr?sc.lines.filter(l=>l.roleId===fr):sc.lines;if(!lines.length)return'';
+      return`<div style="display:flex;align-items:center;gap:8px;margin:18px 0 10px">
+        <span style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);white-space:nowrap">${esc(sc.name)}</span>
+        <div style="flex:1;height:1px;background:var(--border-gold)"></div>
+        ${sc.done?`<span style="font-size:10px;font-weight:800;color:var(--green);background:#E8F5EE;padding:3px 8px;border-radius:8px">✅ SHOT</span>`:''}
+      </div>
+      ${lines.map(ln=>{const rc=rcolor(ln.roleId);return`<div class="script-line" style="border-left-color:${rc}">
+        <span class="line-badge" style="background:${rc}20;color:${rc}">${rname(ln.roleId)}</span>
+        <div class="line-text">${esc(ln.text)}</div>
+        ${sd&&ln.direction?`<div class="line-dir">📐 ${esc(ln.direction)}</div>`:''}
+      </div>`;}).join('')}`;}).join('')}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// ACTOR
+// ══════════════════════════════════════════════
+function vActor(){
+  const p=proj();
+  if(!S.actorRoleId){
+    const rids=[...new Set(p.scenes.flatMap(sc=>sc.lines.map(l=>l.roleId)))];
+    const ar=S.roles.filter(r=>rids.includes(r.id));
+    return`<div class="clapper"></div>
+    <div class="hdr"><button class="hdr-back" onclick="back()">‹ Back</button><div class="hdr-title">Actor Mode</div></div>
+    <div class="content">
+      <div class="info-box"><strong>👁 Actor Mode</strong><br>See only YOUR lines. Every other role's lines are hidden — you focus purely on your cues in order.</div>
+      <div class="sec-label" style="margin-bottom:14px">Choose Your Role</div>
+      ${ar.map(r=>{const cnt=p.scenes.reduce((a,sc)=>a+sc.lines.filter(l=>l.roleId===r.id).length,0);return`<button class="actor-btn" onclick="S.actorRoleId='${r.id}';render()">
+        <div class="actor-dot" style="background:${r.color}"></div>
+        <div class="actor-name">${r.name}</div>
+        <div class="actor-count">${cnt} cue${cnt!==1?'s':''} ›</div>
+      </button>`;}).join('')}
+    </div>`;
+  }
+  const r=role(S.actorRoleId),rc=r?r.color:'#888';let cue=0;
+  return`<div class="clapper" style="background:repeating-linear-gradient(90deg,#1A1209 0,#1A1209 18px,${rc} 18px,${rc} 36px)"></div>
+  <div class="hdr">
+    <button class="hdr-back" onclick="S.actorRoleId=null;render()">‹ Roles</button>
+    <div class="hdr-title" style="color:${rc}">${r?r.name:''}</div>
+    <span class="rec">REC</span>
+  </div>
+  <div class="content">
+    <div style="background:${rc}15;border:1.5px solid ${rc}40;border-radius:10px;padding:10px 14px;margin-bottom:18px;font-size:12px;color:${rc};font-weight:700">📍 Only your lines as ${r?r.name:''}</div>
+    ${p.scenes.map(sc=>{
+      const my=sc.lines.filter(l=>l.roleId===S.actorRoleId);if(!my.length)return'';
+      return`<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px">
+        <span style="font-size:10px;font-weight:700;color:${rc};text-transform:uppercase;letter-spacing:1px;white-space:nowrap">${esc(sc.name)}</span>
+        <div style="flex:1;height:1px;background:${rc}40"></div>
+      </div>
+      ${my.map(ln=>`<div class="script-line" style="border-left-color:${rc};border-left-width:5px">
+        <div style="font-size:10px;font-weight:700;color:${rc};text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Cue ${++cue}</div>
+        <div class="line-text" style="font-size:18px;line-height:1.7">${esc(ln.text)}</div>
+        ${ln.direction&&S.settings.showDir?`<div class="line-dir" style="margin-top:8px">📐 ${esc(ln.direction)}</div>`:''}
+      </div>`).join('')}`;}).join('')}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// CUE MODE  ← THE BIG NEW ONE
+// ══════════════════════════════════════════════
+function vCue(){
+  const p=proj();
+  const lines=allLines(p,S.cueRole||null);
+  const total=lines.length,idx=S.cueIdx;
+  const pct=total>0?Math.round(Math.min(idx,total)/total*100):0;
+
+  if(idx>=total){
+    return`<div class="clapper"></div>
+    <div class="cue-hdr"><button class="hdr-back" onclick="back()">‹ Back</button><div class="cue-counter">Complete!</div></div>
+    <div class="cue-done-screen">
+      <div class="cue-done-icon">🎉</div>
+      <div class="cue-done-title">That's a wrap!</div>
+      <div class="cue-done-sub">You nailed all ${total} lines.<br>Slay Dr. did THAT! 🎬✨</div>
+      <button class="btn-primary" style="margin-bottom:12px" onclick="S.cueIdx=0;render()">↺ Run It Again</button>
+      <button class="btn-secondary" onclick="back()">Back to Script</button>
+    </div>`;
+  }
+
+  const ln=lines[idx];
+  const r=role(ln.roleId),rc=r?r.color:'#888';
+  const nxt=idx+1<total?lines[idx+1]:null;
+  const nxtR=nxt?role(nxt.roleId):null;
+  const rids=[...new Set(p.scenes.flatMap(sc=>sc.lines.map(l=>l.roleId)))];
+  const proles=S.roles.filter(r=>rids.includes(r.id));
+
+  return`<div class="clapper" style="background:repeating-linear-gradient(90deg,#1A1209 0,#1A1209 18px,${rc} 18px,${rc} 36px)"></div>
+  <div class="cue-progress-bar"><div class="cue-progress-fill" style="width:${pct}%"></div></div>
+  <div class="cue-hdr">
+    <button class="hdr-back" onclick="back()">‹</button>
+    <div class="cue-counter">${idx+1} / ${total}</div>
+    <button class="dir-toggle-btn" onclick="S.settings.showDir=!S.settings.showDir;render()">${S.settings.showDir?'📐 On':'📐 Off'}</button>
+  </div>
+  <div id="cue-area">
+    <div style="width:100%">
+      <div class="cue-role-pill" style="background:${rc}20;color:${rc}">🎭 ${r?r.name:'?'}</div>
+      <div class="cue-text">${esc(ln.text)}</div>
+      ${S.settings.showDir&&ln.direction?`<div class="cue-dir-box">📐 ${esc(ln.direction)}</div>`:''}
+      ${nxt?`<div class="cue-next-box">
+        <div class="cue-next-lbl">Coming up — ${nxtR?`<span style="color:${nxtR.color}">${nxtR.name}</span>`:''}</div>
+        <div class="cue-next-text">${esc(nxt.text.slice(0,70))}${nxt.text.length>70?'…':''}</div>
+      </div>`:`<div style="background:linear-gradient(135deg,#E8F5EE,#F5FDF8);border-radius:10px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--green);font-weight:700;text-align:center">🎬 Last line — almost a wrap!</div>`}
+      <div class="cue-hint">Tap Next Cue to advance</div>
+    </div>
+  </div>
+  <div class="cue-controls">
+    <button class="cue-prev" onclick="if(S.cueIdx>0){S.cueIdx--;render();}" ${idx===0?'style="opacity:.35"':''}>‹ Prev</button>
+    <button class="cue-next" onclick="S.cueIdx++;render()">Next Cue ›</button>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// REHEARSE
+// ══════════════════════════════════════════════
+function vRehearse(){
+  const p=proj();
+  if(!S.actorRoleId){
+    const rids=[...new Set(p.scenes.flatMap(sc=>sc.lines.map(l=>l.roleId)))];
+    const ar=S.roles.filter(r=>rids.includes(r.id));
+    return`<div class="clapper"></div>
+    <div class="hdr"><button class="hdr-back" onclick="back()">‹ Back</button><div class="hdr-title">Rehearse Mode</div></div>
+    <div class="content">
+      <div class="info-box"><strong>🧠 Rehearse Mode</strong><br>Your lines are hidden. The other roles are shown so you know when your cue is coming. Tap to reveal your line when you're ready to check it.</div>
+      <div class="sec-label" style="margin-bottom:14px">Which role are you rehearsing?</div>
+      ${ar.map(r=>{const cnt=p.scenes.reduce((a,sc)=>a+sc.lines.filter(l=>l.roleId===r.id).length,0);return`<button class="actor-btn" onclick="S.actorRoleId='${r.id}';S.rehearseRevealed={};render()">
+        <div class="actor-dot" style="background:${r.color}"></div>
+        <div class="actor-name">${r.name}</div>
+        <div class="actor-count">${cnt} lines to rehearse ›</div>
+      </button>`;}).join('')}
+    </div>`;
+  }
+  const r=role(S.actorRoleId),rc=r?r.color:'#888';
+  const allMy=[];p.scenes.forEach(sc=>sc.lines.forEach(l=>{if(l.roleId===S.actorRoleId)allMy.push(l.id);}));
+  const revd=allMy.filter(id=>S.rehearseRevealed[id]).length;
+  let myNum=0;
+  return`<div class="clapper" style="background:repeating-linear-gradient(90deg,#1A1209 0,#1A1209 18px,${rc} 18px,${rc} 36px)"></div>
+  <div class="hdr">
+    <button class="hdr-back" onclick="S.actorRoleId=null;S.rehearseRevealed={};render()">‹ Roles</button>
+    <div class="hdr-title" style="color:${rc}">Rehearsing ${r?r.name:''}</div>
+    <span style="font-size:12px;font-weight:800;color:var(--green)">${revd}/${allMy.length} ✓</span>
+  </div>
+  <div class="content">
+    ${p.scenes.map(sc=>{
+      const hasMe=sc.lines.some(l=>l.roleId===S.actorRoleId);if(!hasMe)return'';
+      return`<div style="display:flex;align-items:center;gap:8px;margin:14px 0 10px">
+        <span style="font-size:10px;font-weight:700;color:${rc};text-transform:uppercase;letter-spacing:1px;white-space:nowrap">${esc(sc.name)}</span>
+        <div style="flex:1;height:1px;background:${rc}40"></div>
+      </div>
+      ${sc.lines.map(ln=>{
+        if(ln.roleId!==S.actorRoleId){
+          const or=role(ln.roleId),orc=or?or.color:'#aaa';
+          return`<div class="rehear-wrap" style="border-left-color:${orc}">
+            <div style="font-size:10px;font-weight:700;color:${orc};text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">${or?or.name:''}</div>
+            <div style="font-size:13px;color:var(--text-dim);line-height:1.5;font-style:italic">${esc(ln.text)}</div>
+          </div>`;
+        }
+        myNum++;const rev=S.rehearseRevealed[ln.id];
+        return`<div class="script-line" style="border-left-color:${rc};border-left-width:5px">
+          <div style="font-size:10px;font-weight:700;color:${rc};margin-bottom:8px;text-transform:uppercase;letter-spacing:1px">Your Line #${myNum}</div>
+          ${rev?`<div class="rehear-show"><div class="line-text">${esc(ln.text)}</div>${ln.direction?`<div class="line-dir" style="margin-top:6px">📐 ${esc(ln.direction)}</div>`:''}</div>`
+          :`<div class="rehear-hide" onclick="S.rehearseRevealed['${ln.id}']=true;render()">
+            <div style="font-size:28px;margin-bottom:6px">👁</div>
+            <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px">Tap to reveal your line</div>
+          </div>`}
+        </div>`;
+      }).join('')}`;}).join('')}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+// TELEPROMPTER
+// ══════════════════════════════════════════════
+function vTP(){
+  const p=proj();
+  const rids=[...new Set(p.scenes.flatMap(sc=>sc.lines.map(l=>l.roleId)))];
+  const proles=S.roles.filter(r=>rids.includes(r.id));
+  const lines=allLines(p,S.tpRole||null);
+  const sd=S.settings.showDir;
+  return`<div class="tp-header">
+    <button class="hdr-back" onclick="back()">‹</button>
+    <div class="tp-title">📺 Teleprompter</div>
+    <button class="tp-btn-sm" onclick="changeFS(-2)">A−</button>
+    <button class="tp-btn-sm" onclick="changeFS(2)">A+</button>
+    <button class="tp-btn-sm" onclick="S.settings.showDir=!S.settings.showDir;render()">${sd?'📐':'📐✗'}</button>
+  </div>
+  <div class="filter-bar">
+    <button class="chip" style="${!S.tpRole?'background:var(--navy);color:#fff;border-color:var(--navy)':'color:var(--text-dim)'}" onclick="setTpRole(null)">All</button>
+    ${proles.map(r=>`<button class="chip" style="${S.tpRole===r.id?`background:${r.color};color:#000;border-color:${r.color}`:'color:var(--text-dim)'}" onclick="setTpRole('${r.id}')"><span class="chip-dot" style="background:${r.color}"></span>${r.name}</button>`).join('')}
+  </div>
+  <div id="tp-wrap"><div id="tp-scroll">
+    <div class="tp-spacer"></div>
+    ${lines.map((ln,i)=>{const r=role(ln.roleId),rc=r?r.color:'#888';return`<div class="tp-line">
+      ${!S.tpRole?`<div class="tp-role" style="color:${rc}">${r?r.name:''}</div>`:''}
+      <div class="tp-text">${esc(ln.text)}</div>
+      ${sd&&ln.direction?`<div class="tp-dir">📐 ${esc(ln.direction)}</div>`:''}
+    </div>`;}).join('')}
+    <div class="tp-spacer-b"></div>
+  </div></div>
+  <div class="tp-controls">
+    <button class="tp-play" id="tp-btn" onclick="toggleTP()">▶</button>
+    <div class="speed-ctrl"><div class="speed-lbl">Speed</div><input type="range" min="0.3" max="6" step="0.1" value="${S.tpSpeed}" oninput="S.tpSpeed=parseFloat(this.value)"></div>
+    <button class="tp-btn-sm" onclick="resetTP()">↺</button>
+  </div>`;
+}
+
+function changeFS(d){S.settings.fontSize=Math.max(12,Math.min(28,(S.settings.fontSize||16)+d));render();}
+function setTpRole(rid){stopTP();S.tpRole=rid;S.tpY=0;render();}
+let tpRAF=null,tpY=0;
+function initTP(){tpY=S.tpY||0;const el=document.getElementById('tp-scroll');if(el)el.style.transform=`translateY(${-tpY}px)`;}
+function toggleTP(){S.tpRunning=!S.tpRunning;const b=document.getElementById('tp-btn');if(b)b.textContent=S.tpRunning?'⏸':'▶';if(S.tpRunning)tpLoop();else stopTPLoop();}
+function tpLoop(){function lp(){tpY+=S.tpSpeed*0.5;S.tpY=tpY;const el=document.getElementById('tp-scroll');if(el){el.style.transform=`translateY(${-tpY}px)`;const max=el.offsetHeight-window.innerHeight+100;if(tpY>=max){stopTPLoop();S.tpRunning=false;const b=document.getElementById('tp-btn');if(b)b.textContent='▶';return;}}tpRAF=requestAnimationFrame(lp);}tpRAF=requestAnimationFrame(lp);}
+function stopTPLoop(){if(tpRAF){cancelAnimationFrame(tpRAF);tpRAF=null;}}
+function stopTP(){S.tpRunning=false;stopTPLoop();}
+function resetTP(){stopTP();tpY=0;S.tpY=0;const el=document.getElementById('tp-scroll');if(el)el.style.transform='translateY(0)';const b=document.getElementById('tp-btn');if(b)b.textContent='▶';}
+
+// ══════════════════════════════════════════════
+// ROLES
+// ══════════════════════════════════════════════
+function vRoles(){return`<div class="clapper"></div>
+  <div class="hdr"><button class="hdr-back" onclick="back()">‹ Back</button><div class="hdr-title">Roles</div><button class="hdr-action" onclick="openModal('add-role')">+ Add</button></div>
+  <div class="content">
+    <div class="sec-label">All Roles (${S.roles.length})</div>
+    ${S.roles.map(r=>`<div class="role-row"><div class="role-dot" style="background:${r.color}"></div><div class="role-row-name">${r.name}</div><button class="role-del" onclick="delRole('${r.id}')">✕</button></div>`).join('')}
+  </div>`;}
+
+// ══════════════════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════════════════
+function vSettings(){
+  const fs=S.settings.fontSize||16,wl=S.settings.wakelock!==false,sd=S.settings.showDir!==false;
+  return`<div class="clapper"></div>
+  <div class="hdr"><button class="hdr-back" onclick="back()">‹ Back</button><div class="hdr-title">Settings</div></div>
+  <div class="content">
+    <div class="sec-label">Display</div>
+    <div class="setting-row"><div class="setting-icon">🔤</div><div class="setting-info"><div class="setting-name">Text Size</div><div class="setting-desc">Adjusts font across all modes</div></div>
+      <div class="fs-row"><button class="fs-btn" onclick="changeFS(-2)">−</button><div class="fs-val">${fs}px</div><button class="fs-btn" onclick="changeFS(2)">+</button></div></div>
+    <div class="setting-row"><div class="setting-icon">📐</div><div class="setting-info"><div class="setting-name">Show Directions</div><div class="setting-desc">Show acting cues & tone notes</div></div>
+      <button class="toggle${sd?' on':''}" onclick="S.settings.showDir=!S.settings.showDir;render()"></button></div>
+    <div class="sec-label" style="margin-top:20px">Performance</div>
+    <div class="setting-row"><div class="setting-icon">📱</div><div class="setting-info"><div class="setting-name">Keep Screen Awake</div><div class="setting-desc">Prevent sleep during filming</div></div>
+      <button class="toggle${wl?' on':''}" onclick="S.settings.wakelock=!S.settings.wakelock;if(!S.settings.wakelock)relWake();render()"></button></div>
+    <div class="sec-label" style="margin-top:20px">About</div>
+    <div class="setting-row" style="cursor:default"><div class="setting-icon">🎬</div><div class="setting-info"><div class="setting-name">CutBySlayDr</div><div class="setting-desc">Your personal directing studio · v2.0</div></div></div>
+  </div>`;}
+
+// ══════════════════════════════════════════════
+// MODAL
+// ══════════════════════════════════════════════
+function openModal(t){S.modal=t;render();}
+function openAddLine(){S.modal='add-line';S.editLineId=null;render();}
+function openEditLine(id){S.modal='edit-line';S.editLineId=id;render();}
+function closeModal(){S.modal=null;S.editLineId=null;render();}
+function renderModal(){
+  if(!S.modal)return'';let body='';
+  if(S.modal==='add-project'){body=`<div class="sheet-title">New Script</div>
+    <div class="fg"><label class="fl">Script Name</label><input class="fi" id="m-pname" placeholder="e.g. CEO Skit, Game Show..." autocomplete="off"></div>
+    <button class="btn-primary" onclick="doCreateProject()">Create Script</button>`;}
+  else if(S.modal==='add-scene'){body=`<div class="sheet-title">New Scene</div>
+    <div class="fg"><label class="fl">Scene Name</label><input class="fi" id="m-sname" placeholder="e.g. Scene 1 — Opening" autocomplete="off"></div>
+    <button class="btn-primary" onclick="doCreateScene()">Add Scene</button>`;}
+  else if(S.modal==='add-line'||S.modal==='edit-line'){
+    const isEdit=S.modal==='edit-line',sc=scene();
+    const el=isEdit&&sc?sc.lines.find(l=>l.id===S.editLineId):null;
+    const sr=el?el.roleId:(S.lastRoleId||'');
+    body=`<div class="sheet-title">${isEdit?'Edit Line':'New Line'}</div>
+    <div class="fg"><label class="fl">Role</label>
+      <div class="role-picker">${S.roles.map(r=>`<button class="rpick${sr===r.id?' sel':''}" id="rp-${r.id}" style="${sr===r.id?`background:${r.color};border-color:${r.color}`:''}" onclick="pickRole('${r.id}','${r.color}')"><span style="width:7px;height:7px;border-radius:50%;background:${r.color};display:inline-block"></span>${r.name}</button>`).join('')}</div>
+      <input type="hidden" id="m-lrole" value="${sr}"></div>
+    <div class="fg"><label class="fl">Dialogue</label><textarea class="fta" id="m-ltext" placeholder="What do you say...">${el?esc(el.text):''}</textarea></div>
+    <div class="fg"><label class="fl">Direction / Tone Note (optional)</label><input class="fi" id="m-ldir" placeholder="e.g. Confident, wink, pause..." value="${el?esc(el.direction):''}"></div>
+    <button class="btn-primary" onclick="${isEdit?`doSaveLine('${el?el.id:''}')`:'doAddLine()'}">  ${isEdit?'Save Changes':'Add Line'}</button>`;}
+  else if(S.modal==='add-role'){body=`<div class="sheet-title">Add Role</div>
+    <div class="fg"><label class="fl">Role Name</label><input class="fi" id="m-rname" placeholder="e.g. Host, MC, Comedian..." autocomplete="off"></div>
+    <div class="fg"><label class="fl">Colour</label><div class="swatches">${COLORS.map(c=>`<div class="swatch${S.newColor===c?' sel':''}" style="background:${c}" onclick="S.newColor='${c}';render()"></div>`).join('')}</div></div>
+    <button class="btn-primary" onclick="doCreateRole()">Add Role</button>`;}
+  return`<div class="overlay" onclick="if(event.target===this)closeModal()"><div class="sheet"><div class="sheet-handle"></div>${body}<button class="btn-secondary" onclick="closeModal()">Cancel</button></div></div>`;}
+
+function pickRole(rid,rc){document.querySelectorAll('.rpick').forEach(b=>{b.classList.remove('sel');b.style.background='';b.style.borderColor='';b.style.color='';});const btn=document.getElementById('rp-'+rid);if(btn){btn.classList.add('sel');btn.style.background=rc;btn.style.borderColor=rc;btn.style.color='#000';}const inp=document.getElementById('m-lrole');if(inp)inp.value=rid;S.lastRoleId=rid;}
+
+// ══════════════════════════════════════════════
+// ACTIONS
+// ══════════════════════════════════════════════
+function doCreateProject(){const n=(document.getElementById('m-pname')||{}).value?.trim();if(!n){toast('Please enter a name');return;}const p={id:uid(),name:n,createdAt:Date.now(),scenes:[]};S.projects.unshift(p);closeModal();nav('project',{projectId:p.id});}
+function delProject(id){if(!confirm('Delete this script? This cannot be undone.'))return;S.projects=S.projects.filter(p=>p.id!==id);nav('home');}
+function doCreateScene(){const n=(document.getElementById('m-sname')||{}).value?.trim();if(!n){toast('Please enter a scene name');return;}const p=proj();if(!p)return;const sc={id:uid(),name:n,done:false,lines:[]};p.scenes.push(sc);closeModal();nav('scene-editor',{projectId:p.id,sceneId:sc.id});}
+function delScene(sid){if(!confirm('Delete this scene?'))return;const p=proj();if(!p)return;p.scenes=p.scenes.filter(sc=>sc.id!==sid);nav('project',{projectId:p.id});}
+function doAddLine(){const rid=(document.getElementById('m-lrole')||{}).value,txt=(document.getElementById('m-ltext')||{}).value?.trim(),dir=(document.getElementById('m-ldir')||{}).value?.trim();if(!rid){toast('Please pick a role');return;}if(!txt){toast('Please enter dialogue');return;}const sc=scene();if(!sc)return;sc.lines.push({id:uid(),roleId:rid,text:txt,direction:dir||''});S.lastRoleId=rid;closeModal();}
+function doSaveLine(lid){const rid=(document.getElementById('m-lrole')||{}).value,txt=(document.getElementById('m-ltext')||{}).value?.trim(),dir=(document.getElementById('m-ldir')||{}).value?.trim();if(!rid){toast('Please pick a role');return;}if(!txt){toast('Please enter dialogue');return;}const sc=scene();if(!sc)return;const ln=sc.lines.find(l=>l.id===lid);if(ln){ln.roleId=rid;ln.text=txt;ln.direction=dir||'';}closeModal();}
+function delLine(lid){const sc=scene();if(!sc)return;sc.lines=sc.lines.filter(l=>l.id!==lid);render();}
+function moveLine(lid,dir){const sc=scene();if(!sc)return;const i=sc.lines.findIndex(l=>l.id===lid),ni=i+dir;if(ni<0||ni>=sc.lines.length)return;[sc.lines[i],sc.lines[ni]]=[sc.lines[ni],sc.lines[i]];render();}
+function doCreateRole(){const n=(document.getElementById('m-rname')||{}).value?.trim();if(!n){toast('Please enter a role name');return;}S.roles.push({id:uid(),name:n,color:S.newColor});closeModal();toast(`"${n}" added! 🎭`);}
+function delRole(id){if(S.roles.length<=1){toast("Can't delete your only role");return;}if(!confirm('Delete this role?'))return;S.roles=S.roles.filter(r=>r.id!==id);render();}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+render();
+</script>
+</body>
+</html>
